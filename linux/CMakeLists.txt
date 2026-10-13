@@ -39,11 +39,14 @@ endif()
 # Be cautious about adding new options here, as plugins use this function by
 # default. In most cases, you should add new options to specific targets instead
 # of modifying this function.
+include(../cmake/ApplyStandardSettings.cmake)
 function(APPLY_STANDARD_SETTINGS TARGET)
-  target_compile_features(${TARGET} PUBLIC cxx_std_14)
-  target_compile_options(${TARGET} PRIVATE -Wall -Werror)
-  target_compile_options(${TARGET} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:-O3>")
-  target_compile_definitions(${TARGET} PRIVATE "$<$<NOT:$<CONFIG:Debug>>:NDEBUG>")
+  apply_standard_settings(
+    ${TARGET}
+    14
+    "-Wall;-Werror;$<$<NOT:$<CONFIG:Debug>>:-O3>"
+    "$<$<NOT:$<CONFIG:Debug>>:NDEBUG>"
+  )
 endfunction()
 
 # Flutter library and tool build rules.
@@ -73,6 +76,7 @@ set_target_properties(${BINARY_NAME}
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
 include(flutter/generated_plugins.cmake)
+include(../cmake/InstallFlutterAssets.cmake)
 
 
 # === Installation ===
@@ -106,20 +110,7 @@ foreach(bundled_library ${PLUGIN_BUNDLED_LIBRARIES})
     COMPONENT Runtime)
 endforeach(bundled_library)
 
-# Copy the native assets provided by the build.dart from all packages.
-set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/linux/")
-install(DIRECTORY "${NATIVE_ASSETS_DIR}"
-   DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-   COMPONENT Runtime)
-
-# Fully re-copy the assets directory on each build to avoid having stale files
-# from a previous install.
-set(FLUTTER_ASSET_DIR_NAME "flutter_assets")
-install(CODE "
-  file(REMOVE_RECURSE \"${INSTALL_BUNDLE_DATA_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
-  " COMPONENT Runtime)
-install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
-  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
+install_flutter_assets("${PROJECT_BUILD_DIR}" "${INSTALL_BUNDLE_DATA_DIR}" "${INSTALL_BUNDLE_LIB_DIR}" "linux")
 
 # Install the AOT library on non-Debug builds only.
 if(NOT CMAKE_BUILD_TYPE MATCHES "Debug")

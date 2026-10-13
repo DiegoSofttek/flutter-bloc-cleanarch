@@ -37,12 +37,14 @@ add_definitions(-DUNICODE -D_UNICODE)
 # Be cautious about adding new options here, as plugins use this function by
 # default. In most cases, you should add new options to specific targets instead
 # of modifying this function.
+include(../cmake/ApplyStandardSettings.cmake)
 function(APPLY_STANDARD_SETTINGS TARGET)
-  target_compile_features(${TARGET} PUBLIC cxx_std_17)
-  target_compile_options(${TARGET} PRIVATE /W4 /WX /wd"4100")
-  target_compile_options(${TARGET} PRIVATE /EHsc)
-  target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
-  target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
+  apply_standard_settings(
+    ${TARGET}
+    17
+    "/W4;/WX;/wd\"4100\";/EHsc"
+    "_HAS_EXCEPTIONS=0;$<$<CONFIG:Debug>:_DEBUG>"
+  )
 endfunction()
 
 # Flutter library and tool build rules.
@@ -56,6 +58,7 @@ add_subdirectory("runner")
 # Generated plugin build rules, which manage building the plugins and adding
 # them to the application.
 include(flutter/generated_plugins.cmake)
+include(../cmake/InstallFlutterAssets.cmake)
 
 
 # === Installation ===
@@ -87,20 +90,7 @@ if(PLUGIN_BUNDLED_LIBRARIES)
     COMPONENT Runtime)
 endif()
 
-# Copy the native assets provided by the build.dart from all packages.
-set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/windows/")
-install(DIRECTORY "${NATIVE_ASSETS_DIR}"
-   DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
-   COMPONENT Runtime)
-
-# Fully re-copy the assets directory on each build to avoid having stale files
-# from a previous install.
-set(FLUTTER_ASSET_DIR_NAME "flutter_assets")
-install(CODE "
-  file(REMOVE_RECURSE \"${INSTALL_BUNDLE_DATA_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
-  " COMPONENT Runtime)
-install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
-  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
+install_flutter_assets("${PROJECT_BUILD_DIR}" "${INSTALL_BUNDLE_DATA_DIR}" "${INSTALL_BUNDLE_LIB_DIR}" "windows")
 
 # Install the AOT library on non-Debug builds only.
 install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
