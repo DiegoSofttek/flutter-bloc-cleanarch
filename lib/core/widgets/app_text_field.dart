@@ -2,8 +2,9 @@
 // any feature that needs a styled text input instead of a bare TextFormField.
 
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
+
 import '../constants/app_text_styles.dart';
+import '../theme/app_input_decoration.dart';
 
 /// Reusable text field with label, validation, and optional obscure-text toggle.
 class AppTextField extends StatefulWidget {
@@ -55,47 +56,17 @@ class _AppTextFieldState extends State<AppTextField> {
           enabled: widget.enabled,
           validator: widget.validator,
           style: AppTextStyles.bodyText,
-          decoration: InputDecoration(
+          decoration: buildAppInputDecorationTheme().copyWith(
             hintText: widget.hint,
-            hintStyle: AppTextStyles.bodyText.copyWith(
-              color: AppColors.textHint,
-            ),
             prefixIcon: widget.prefixIcon,
             suffixIcon: widget.obscureText
                 ? IconButton(
                     icon: Icon(
                       _obscure ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.textSecondary,
                     ),
                     onPressed: () => setState(() => _obscure = !_obscure),
                   )
                 : null,
-            filled: true,
-            fillColor: AppColors.surface,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 14,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
-            ),
           ),
         ),
       ],
