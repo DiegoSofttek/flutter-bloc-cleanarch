@@ -3,6 +3,7 @@
 
 import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
+import '../constants/app_input_borders.dart';
 import '../constants/app_text_styles.dart';
 
 /// Reusable text field with label, validation, and optional obscure-text toggle.
@@ -76,26 +77,11 @@ class _AppTextFieldState extends State<AppTextField> {
               horizontal: 16,
               vertical: 14,
             ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
-            ),
+            border: AppInputBorders.base(),
+            enabledBorder: AppInputBorders.base(),
+            focusedBorder: AppInputBorders.focused(),
+            errorBorder: AppInputBorders.error(),
+            focusedErrorBorder: AppInputBorders.focusedError(),
           ),
         ),
       ],
